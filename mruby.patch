@@ -1,0 +1,171 @@
+diff -urN a/build_config.rb b/build_config.rb
+--- a/build_config.rb	2015-01-21 15:19:30.495533081 +0900
++++ b/build_config.rb	2015-01-21 15:22:37.858985712 +0900
+@@ -86,3 +86,11 @@
+ #   conf.test_runner.command = 'env'
+ #
+ # end
++MRuby::CrossBuild.new('kernel') do |conf|
++  toolchain :gcc
++
++  conf.cc.flags << "-Iinclude/kernel -mcmodel=kernel -mno-red-zone -mfpmath=387 -mno-sse -mno-sse2 -mno-mmx -mno-3dnow -msoft-float -fno-asynchronous-unwind-tables -fno-omit-frame-pointer"
++  conf.cc.defines << %w(DISABLE_STDIO)
++  conf.cc.defines << %w(DISABLE_FLOAT)
++  conf.cc.defines << %w(MRB_INT64)
++end
+diff -urN a/include/kernel/math.h b/include/kernel/math.h
+--- a/include/kernel/math.h	1970-01-01 09:00:00.000000000 +0900
++++ b/include/kernel/math.h	2015-01-21 15:22:37.816986059 +0900
+@@ -0,0 +1,7 @@
++# define fmod(x,y) (x)
++# define pow(x,y) (x)
++# define log10(x) (x)
++# define floor(x) (x)
++# define ceil(x) (x)
++# define isinf(x) 0
++# define isnan(x) 0
+diff -urN a/include/kernel/stdarg.h b/include/kernel/stdarg.h
+--- a/include/kernel/stdarg.h	1970-01-01 09:00:00.000000000 +0900
++++ b/include/kernel/stdarg.h	2015-01-21 15:22:37.816986059 +0900
+@@ -0,0 +1,7 @@
++typedef unsigned long size_t;
++typedef __builtin_va_list __gnuc_va_list;
++typedef __gnuc_va_list va_list;
++#define va_start(v,l) __builtin_va_start(v,l)
++#define va_end(v)     __builtin_va_end(v)
++#define va_arg(v,l)   __builtin_va_arg(v,l)
++int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+diff -urN a/include/kernel/stdlib.h b/include/kernel/stdlib.h
+--- a/include/kernel/stdlib.h	1970-01-01 09:00:00.000000000 +0900
++++ b/include/kernel/stdlib.h	2015-01-21 15:22:37.816986059 +0900
+@@ -0,0 +1,12 @@
++typedef unsigned long size_t;
++void free(void *ptr);
++void *realloc(void *ptr, size_t size);
++int abs(int j);
++unsigned long int strtol(const char *nptr, char **endptr, int base);
++unsigned long int strtoul(const char *nptr, char **endptr, int base);
++void exit(int status);
++#define EXIT_SUCCESS 0
++#define EXIT_FAILURE (-1)
++void abort(void);
++int atoi(const char *nptr);
++# define strtod(p,e) strtol(p,e,10)
+diff -urN a/include/mruby/value.h b/include/mruby/value.h
+--- a/include/mruby/value.h	2015-01-21 15:19:30.497533064 +0900
++++ b/include/mruby/value.h	2015-01-21 15:22:37.818986042 +0900
+@@ -7,7 +7,13 @@
+ #ifndef MRUBY_VALUE_H
+ #define MRUBY_VALUE_H
+ 
+-#ifdef MRB_USE_FLOAT
++#if defined(DISABLE_FLOAT)
++  typedef long mrb_float;
++# define double long
++int sprintf(char *str, const char *format, ...);
++# define mrb_float_to_str(buf, i) sprintf(buf, "%d", i)
++# define str_to_mrb_float(buf) strtol(buf, NULL, 10)
++#elif defined(MRB_USE_FLOAT)
+   typedef float mrb_float;
+ # define mrb_float_to_str(buf, i) sprintf(buf, "%.7e", i)
+ # define str_to_mrb_float(buf) strtof(buf, NULL)
+diff -urN a/src/numeric.c b/src/numeric.c
+--- a/src/numeric.c	2015-01-21 15:19:30.507532981 +0900
++++ b/src/numeric.c	2015-01-21 15:22:37.852985762 +0900
+@@ -209,7 +209,7 @@
+       if (m < 0) {
+         m -= 1;
+       }
+-      n = n / pow(10.0, m);
++      n = n / pow((mrb_float)10.0, m);
+       m = 0;
+     }
+     else {
+@@ -222,15 +222,15 @@
+ 
+     /* puts digits */
+     while (max_digit >= 0) {
+-      mrb_float weight = pow(10.0, m);
+-      digit = (int)floor(n / weight + FLT_EPSILON);
++      mrb_float weight = pow((mrb_float)10.0, m);
++      digit = (int)floor(n / weight + (mrb_float)FLT_EPSILON);
+       *(c++) = '0' + digit;
+       n -= (digit * weight);
+       max_digit--;
+       if (m-- == 0) {
+         *(c++) = '.';
+       }
+-      else if (m < -1 && n < FLT_EPSILON) {
++      else if (m < -1 && n < (mrb_float)FLT_EPSILON) {
+         break;
+       }
+     }
+@@ -324,7 +324,7 @@
+   mrb_float div;
+   mrb_float mod;
+ 
+-  if (y == 0.0) {
++  if (y == (mrb_float)0.0) {
+     div = str_to_mrb_float("inf");
+     mod = str_to_mrb_float("nan");
+   }
+@@ -336,7 +336,7 @@
+       div = (x - mod) / y;
+     if (y*mod < 0) {
+       mod += y;
+-      div -= 1.0;
++      div -= (mrb_float)1.0;
+     }
+   }
+ 
+@@ -457,7 +457,7 @@
+ 
+   d = (mrb_float)mrb_fixnum(num);
+   /* normalize -0.0 to 0.0 */
+-  if (d == 0) d = 0.0;
++  if (d == 0) d = (mrb_float)0.0;
+   c = (char*)&d;
+   for (hash=0, i=0; i<sizeof(mrb_float);i++) {
+     hash = (hash * 971) ^ (unsigned char)c[i];
+@@ -615,10 +615,10 @@
+ 
+   mrb_get_args(mrb, "|i", &ndigits);
+   number = mrb_float(num);
+-  f = 1.0;
++  f = (mrb_float)1.0;
+   i = abs(ndigits);
+   while  (--i >= 0)
+-    f = f*10.0;
++    f = f*(mrb_float)10.0;
+ 
+   if (isinf(f)) {
+     if (ndigits < 0) number = 0;
+@@ -630,13 +630,13 @@
+     else number *= f;
+ 
+     /* home-made inline implementation of round(3) */
+-    if (number > 0.0) {
++    if (number > (mrb_float)0.0) {
+         d = floor(number);
+-        number = d + (number - d >= 0.5);
++        number = d + (number - d >= (mrb_float)0.5);
+     }
+-    else if (number < 0.0) {
++    else if (number < (mrb_float)0.0) {
+         d = ceil(number);
+-        number = d - (d - number >= 0.5);
++        number = d - (d - number >= (mrb_float)0.5);
+     }
+ 
+     if (ndigits < 0) number *= f;
+@@ -662,8 +662,8 @@
+ {
+   mrb_float f = mrb_float(num);
+ 
+-  if (f > 0.0) f = floor(f);
+-  if (f < 0.0) f = ceil(f);
++  if (f > (mrb_float)0.0) f = floor(f);
++  if (f < (mrb_float)0.0) f = ceil(f);
+ 
+   if (!FIXABLE(f)) {
+     return mrb_float_value(mrb, f);
