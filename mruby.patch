@@ -1,7 +1,7 @@
 diff -urN a/build_config.rb b/build_config.rb
 --- a/build_config.rb	2015-01-21 15:19:30.495533081 +0900
 +++ b/build_config.rb	2015-01-21 15:22:37.858985712 +0900
-@@ -86,3 +86,11 @@
+@@ -86,3 +86,12 @@
  #   conf.test_runner.command = 'env'
  #
  # end
@@ -12,6 +12,7 @@ diff -urN a/build_config.rb b/build_config.rb
 +  conf.cc.defines << %w(DISABLE_STDIO)
 +  conf.cc.defines << %w(DISABLE_FLOAT)
 +  conf.cc.defines << %w(MRB_INT64)
++  conf.bins = []
 +end
 diff -urN a/include/kernel/math.h b/include/kernel/math.h
 --- a/include/kernel/math.h	1970-01-01 09:00:00.000000000 +0900
