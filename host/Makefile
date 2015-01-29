@@ -10,4 +10,4 @@ hello.c: hello.rb
 	../mruby/bin/mrbc -Bcode $<
 
 clean:
-	rm -f main $(OBJS) .hello.o.cmd
+	rm -f main $(OBJS) hello.c .hello.o.cmd

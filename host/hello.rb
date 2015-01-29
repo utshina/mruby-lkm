@@ -1,1 +1,1 @@
-Kernel.printk "Hello World!\n"
+Linux.printk "Hello World!\n"

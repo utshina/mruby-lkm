@@ -12,7 +12,6 @@ int setjmp(jmp_buf env);
 void longjmp(jmp_buf env, int val);
 
 int * __errno_location(void);
-const unsigned short * * __ctype_b_loc (void);
 
 long int strtol(const char *nptr, char **endptr, int base);
 unsigned long int strtoul(const char *nptr, char **endptr, int base);
@@ -45,49 +44,6 @@ int * __errno_location(void)
 {
 	static int errno;
 	return &errno;
-}
-
-const unsigned short * * __ctype_b_loc (void)
-{
-	printk("%s\n", __FUNCTION__);
-	return NULL;
-}
-
-const unsigned short * * __ctype_tolower_loc (void)
-{
-	printk("%s\n", __FUNCTION__);
-	return NULL;
-}
-
-const unsigned short * * __ctype_toupper_loc (void)
-{
-	printk("%s\n", __FUNCTION__);
-	return NULL;
-}
-
-int isspace(int c)
-{
-	return (c == 0x20) | (0x09 <= c && c <= 0x0d);
-}
-
-int isdigit(int c) 
-{
-	return ('0' <= c && c <= '9');
-}
-
-int isupper(int c)
-{
-	return ('A' <= c && c <= 'Z');
-}
-
-int islower(int c)
-{
-	return ('a' <= c && c <= 'z');
-}
-
-int isalpha(int c)
-{
-	return isupper(c) || islower(c);
 }
 
 long int strtol(const char *nptr, char **endptr, int base)
