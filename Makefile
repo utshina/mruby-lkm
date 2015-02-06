@@ -7,7 +7,7 @@ mruby/build/kernel/lib/libmruby.a: mruby
 
 mruby:
 	git clone https://github.com/mruby/mruby.git
-	cd mruby; git checkout 1.1.0
+	cd mruby; git checkout 4957c852696c9559bfbea988325fd9bf94fc34bc
 	cd mruby; patch -p1 < ../mruby.patch
 	cd mruby; make
 

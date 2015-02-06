@@ -249,15 +249,3 @@ diff -urN a/src/symbol.c b/src/symbol.c
      mrb->symtbl = (symbol_name*)mrb_realloc(mrb, mrb->symtbl, sizeof(symbol_name)*(mrb->symcapa+1));
    }
    sname = &mrb->symtbl[sym];
-diff -urN a/tasks/mruby_build_gem.rake b/tasks/mruby_build_gem.rake
---- a/tasks/mruby_build_gem.rake	2015-01-30 01:35:26.805620132 +0900
-+++ b/tasks/mruby_build_gem.rake	2015-01-29 21:02:43.146048445 +0900
-@@ -31,7 +31,7 @@
-       return nil unless Gem.current
- 
-       Gem.current.dir = gemdir
--      Gem.current.build = MRuby::Build.current
-+      Gem.current.build = self
-       Gem.current.build_config_initializer = block
-       gems << Gem.current
- 
