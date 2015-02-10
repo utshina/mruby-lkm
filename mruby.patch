@@ -1,6 +1,6 @@
 diff -urN a/build_config.rb b/build_config.rb
---- a/build_config.rb	2015-01-30 01:21:59.907172875 +0900
-+++ b/build_config.rb	2015-01-30 01:35:47.125454432 +0900
+--- a/build_config.rb	2015-02-10 13:00:31.492171666 +0900
++++ b/build_config.rb	2015-02-10 12:52:34.712938550 +0900
 @@ -122,3 +122,13 @@
  #   conf.test_runner.command = 'env'
  #
@@ -17,7 +17,7 @@ diff -urN a/build_config.rb b/build_config.rb
 +end
 diff -urN a/include/kernel/ctype.h b/include/kernel/ctype.h
 --- a/include/kernel/ctype.h	1970-01-01 09:00:00.000000000 +0900
-+++ b/include/kernel/ctype.h	2015-01-30 01:31:31.345533289 +0900
++++ b/include/kernel/ctype.h	2015-02-10 12:52:34.712938550 +0900
 @@ -0,0 +1,13 @@
 +#if 0
 +#include <linux/ctype.h>
@@ -34,7 +34,7 @@ diff -urN a/include/kernel/ctype.h b/include/kernel/ctype.h
 +#define isxdigit(c) (isdigit(c) || ('a' <= (c) && (c) <= 'f') || ('A' <= (c) && (c) <= 'F'))
 diff -urN a/include/kernel/math.h b/include/kernel/math.h
 --- a/include/kernel/math.h	1970-01-01 09:00:00.000000000 +0900
-+++ b/include/kernel/math.h	2015-01-29 21:02:43.144048461 +0900
++++ b/include/kernel/math.h	2015-02-10 12:52:34.712938550 +0900
 @@ -0,0 +1,11 @@
 +# define fmod(x,y) (x)
 +# define pow(x,y) (x)
@@ -47,9 +47,16 @@ diff -urN a/include/kernel/math.h b/include/kernel/math.h
 +# define signbit(x) 0
 +# define INFINITY LONG_MAX
 +# define NAN (-1)
+diff -urN a/include/kernel/setjmp.h b/include/kernel/setjmp.h
+--- a/include/kernel/setjmp.h	1970-01-01 09:00:00.000000000 +0900
++++ b/include/kernel/setjmp.h	2015-02-10 12:56:30.944080997 +0900
+@@ -0,0 +1,3 @@
++typedef int jmp_buf[6];
++#define setjmp(env) __builtin_setjmp(env)
++#define longjmp(env, val) __builtin_longjmp(env, val)
 diff -urN a/include/kernel/stdarg.h b/include/kernel/stdarg.h
 --- a/include/kernel/stdarg.h	1970-01-01 09:00:00.000000000 +0900
-+++ b/include/kernel/stdarg.h	2015-01-29 21:02:43.145048453 +0900
++++ b/include/kernel/stdarg.h	2015-02-10 12:52:34.712938550 +0900
 @@ -0,0 +1,7 @@
 +typedef unsigned long size_t;
 +typedef __builtin_va_list __gnuc_va_list;
@@ -60,7 +67,7 @@ diff -urN a/include/kernel/stdarg.h b/include/kernel/stdarg.h
 +int vsnprintf(char *str, size_t size, const char *format, va_list ap);
 diff -urN a/include/kernel/stdlib.h b/include/kernel/stdlib.h
 --- a/include/kernel/stdlib.h	1970-01-01 09:00:00.000000000 +0900
-+++ b/include/kernel/stdlib.h	2015-01-29 21:02:43.145048453 +0900
++++ b/include/kernel/stdlib.h	2015-02-10 12:52:34.712938550 +0900
 @@ -0,0 +1,12 @@
 +typedef unsigned long size_t;
 +void free(void *ptr);
@@ -75,8 +82,8 @@ diff -urN a/include/kernel/stdlib.h b/include/kernel/stdlib.h
 +int atoi(const char *nptr);
 +# define strtod(p,e) strtol(p,e,10)
 diff -urN a/include/mruby/value.h b/include/mruby/value.h
---- a/include/mruby/value.h	2015-01-30 01:21:59.910172851 +0900
-+++ b/include/mruby/value.h	2015-01-29 21:02:43.145048453 +0900
+--- a/include/mruby/value.h	2015-02-10 13:00:31.497171627 +0900
++++ b/include/mruby/value.h	2015-02-10 12:52:34.712938550 +0900
 @@ -32,7 +32,13 @@
  # define MRB_INT_MAX (INT32_MAX>>MRB_FIXNUM_SHIFT)
  #endif
@@ -93,8 +100,8 @@ diff -urN a/include/mruby/value.h b/include/mruby/value.h
  # define mrb_float_to_str(buf, i) sprintf(buf, "%.7e", i)
  # define str_to_mrb_float(buf) strtof(buf, NULL)
 diff -urN a/include/mruby.h b/include/mruby.h
---- a/include/mruby.h	2015-01-30 01:35:26.799620181 +0900
-+++ b/include/mruby.h	2015-01-29 21:02:43.145048453 +0900
+--- a/include/mruby.h	2015-02-10 13:00:31.495171642 +0900
++++ b/include/mruby.h	2015-02-10 12:52:34.713938542 +0900
 @@ -188,7 +188,7 @@
    mrb_int atexit_stack_len;
  } mrb_state;
@@ -104,7 +111,7 @@ diff -urN a/include/mruby.h b/include/mruby.h
  # define mrb_noreturn _Noreturn
  #elif defined __GNUC__ && !defined __STRICT_ANSI__
  # define mrb_noreturn __attribute__((noreturn))
-@@ -448,7 +448,7 @@
+@@ -451,7 +451,7 @@
  #define mrb_assert_int_fit(t1,n,t2,max) ((void)0)
  #endif
  
@@ -114,8 +121,8 @@ diff -urN a/include/mruby.h b/include/mruby.h
  #else
  #define mrb_static_assert(exp, str) mrb_assert(exp)
 diff -urN a/src/gc.c b/src/gc.c
---- a/src/gc.c	2015-01-30 01:21:59.924172737 +0900
-+++ b/src/gc.c	2015-01-29 21:02:43.145048453 +0900
+--- a/src/gc.c	2015-02-10 13:00:31.508171539 +0900
++++ b/src/gc.c	2015-02-10 12:52:34.713938542 +0900
 @@ -378,7 +378,7 @@
  #else
    if (mrb->arena_idx >= mrb->arena_capa) {
@@ -135,8 +142,8 @@ diff -urN a/src/gc.c b/src/gc.c
        capa = MRB_GC_ARENA_SIZE;
      }
 diff -urN a/src/numeric.c b/src/numeric.c
---- a/src/numeric.c	2015-01-30 01:21:59.925172729 +0900
-+++ b/src/numeric.c	2015-01-29 21:02:43.146048445 +0900
+--- a/src/numeric.c	2015-02-10 13:00:31.509171531 +0900
++++ b/src/numeric.c	2015-02-10 12:52:34.713938542 +0900
 @@ -138,8 +138,8 @@
        *(c++) = '-';
      }
@@ -238,8 +245,8 @@ diff -urN a/src/numeric.c b/src/numeric.c
    if (!FIXABLE(f)) {
      return mrb_float_value(mrb, f);
 diff -urN a/src/symbol.c b/src/symbol.c
---- a/src/symbol.c	2015-01-30 01:21:59.927172713 +0900
-+++ b/src/symbol.c	2015-01-29 21:02:43.146048445 +0900
+--- a/src/symbol.c	2015-02-10 13:00:31.511171515 +0900
++++ b/src/symbol.c	2015-02-10 12:52:34.713938542 +0900
 @@ -68,7 +68,7 @@
    sym = ++mrb->symidx;
    if (mrb->symcapa < sym) {

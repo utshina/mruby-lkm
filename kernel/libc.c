@@ -7,10 +7,6 @@ typedef unsigned long size_t;
 void *realloc(void *ptr, size_t size);
 void free(void *ptr);
 
-typedef int jmp_buf[6];
-int setjmp(jmp_buf env);
-void longjmp(jmp_buf env, int val);
-
 int * __errno_location(void);
 
 long int strtol(const char *nptr, char **endptr, int base);
@@ -28,16 +24,6 @@ void *realloc(void *ptr, size_t size)
 void free(void *ptr)
 {
 	kfree(ptr);
-}
-
-int _setjmp(jmp_buf env)
-{
-	return __builtin_setjmp(env);
-}
-
-void longjmp(jmp_buf env, int val)
-{
-	__builtin_longjmp(env, 1);
 }
 
 int * __errno_location(void)
