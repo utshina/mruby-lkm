@@ -13,3 +13,9 @@ Just type 'make'.
 
 It will download the mruby source code, change the branch, compile mruby,
 compile rutime to run mruby on host, and make a mruby kernel module.
+
+## Run
+
+    sudo insmod kernel/mruby.ko        # load the mruby kernel module
+    sudo cat hello.mrb > /proc/mruby   # load and execute the mruby bytecode
+    dmesg                              # check the output

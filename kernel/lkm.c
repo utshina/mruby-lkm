@@ -2,16 +2,18 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/ctype.h>
-
-extern int mruby_main(void);
+#include <mruby.h>
+#include "mruby-lkm.h"
 
 static int lkm_init(void)
 {
 	printk(KERN_INFO "LKM: init\n");
-	return mruby_main();
+	mruby_proc_init();
+	return 0;
 }
 
 static void lkm_exit(void) {
+	mruby_proc_exit();
 	printk(KERN_INFO "LKM: exit\n");
 }
 

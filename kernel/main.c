@@ -1,9 +1,8 @@
 #include <linux/kernel.h>
-#include "mruby.h"
-#include "mruby/irep.h"
-#include "mruby/string.h"
-
-extern uint8_t code[];
+#include <mruby.h>
+#include <mruby/irep.h>
+#include <mruby/string.h>
+#include "mruby-lkm.h"
 
 static mrb_value
 linux_printk(mrb_state *mrb, mrb_value self)
@@ -17,8 +16,8 @@ linux_printk(mrb_state *mrb, mrb_value self)
 	return retval;
 }
 
-int
-mruby_main(void)
+mrb_value
+mruby_exec(uint8_t *code)
 {
 	mrb_state *mrb;
 	struct RClass *Linux;
@@ -30,6 +29,6 @@ mruby_main(void)
 				linux_printk, ARGS_REQ(1));
 
 	ret = mrb_load_irep(mrb, code);
-	printk("mruby: ret = %d\n", ret.value.i);
-	return 0;
+	mrb_close(mrb);
+	return ret;
 }

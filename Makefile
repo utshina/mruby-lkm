@@ -1,6 +1,9 @@
-all: mruby/build/kernel/lib/libmruby.a
+all: mruby/build/kernel/lib/libmruby.a hello.mrb
 	cd host; make
 	cd kernel; make
+
+hello.mrb: hello.rb mruby
+	mruby/bin/mrbc $<
 
 mruby/build/kernel/lib/libmruby.a: mruby
 	cd mruby; make
@@ -15,6 +18,7 @@ clean:
 	if [ -d mruby ]; then cd mruby; make clean; fi
 	cd host; make clean
 	cd kernel; make clean
+	rm -f hello.mrb
 
 distclean: clean
 	rm -rf mruby

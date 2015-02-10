@@ -1,6 +1,6 @@
 CFLAGS = -I../mruby/include -g
 LDFLAGS = -lm
-OBJS = main.o hello.o
+OBJS = main.o
 LIBS = ../mruby/build/kernel/lib/libmruby.a
 
 main: $(OBJS) $(LIBS)
