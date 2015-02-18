@@ -5,7 +5,7 @@
 #include "mruby-lkm.h"
 
 static mrb_state *mrb = NULL;
-static mrb_value mrb_ret = 0;
+static mrb_value mrb_ret;
 
 static mrb_value
 linux_printk(mrb_state *mrb, mrb_value self)
