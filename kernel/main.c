@@ -7,12 +7,13 @@
 static mrb_value
 linux_printk(mrb_state *mrb, mrb_value self)
 {
+	int ret;
 	mrb_value retval;
 	mrb_value str;
 
 	mrb_get_args(mrb, "S", &str);
-	printk(KERN_INFO "mruby: %s\n", RSTRING_PTR(str));
-	retval.value.i = 0;
+	ret = printk(KERN_INFO "mruby: %s\n", RSTRING_PTR(str));
+	retval.value.i = ret;
 	return retval;
 }
 
