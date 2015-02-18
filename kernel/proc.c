@@ -3,7 +3,6 @@
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
-#include <mruby.h>
 #include "mruby-lkm.h"
 
 static uint8_t *code = NULL;
@@ -50,11 +49,8 @@ mruby_proc_open(struct inode *inode, struct file *file)
 int
 mruby_proc_release(struct inode *inode, struct file *file)
 {
-    	mrb_value ret;
-
 	if (written) {
-	    ret = mruby_exec(code);
-	    pr_info("mruby-lkm: ret = %d\n", ret.value.i);
+	    mruby_load(code);
 	    written = 0;
 	}
     
@@ -82,6 +78,7 @@ void mruby_proc_init(void)
 void mruby_proc_exit(void)
 {
 	remove_proc_entry("mruby", NULL);
+	mruby_unload();
 	if (code != NULL)
 		kfree(code);
 }
