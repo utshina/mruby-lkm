@@ -46,10 +46,10 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
 
 void abort()
 {
-	printk("%s\n", __FUNCTION__);
+	panic("mruby abort()");
 }
 
 void exit(int status)
 {
-	printk("%s\n", __FUNCTION__);
+	panic("mruby exit(%d)", status);
 }
