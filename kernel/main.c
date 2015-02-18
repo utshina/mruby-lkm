@@ -24,7 +24,7 @@ mruby_exec(uint8_t *code)
 	mrb_value ret;
 
 	mrb = mrb_open();
-	Linux = mrb_define_module(mrb, "Linux");
+	Linux = mrb_define_class(mrb, "Linux", mrb->object_class);
 	mrb_define_class_method(mrb, Linux, "printk",
 				linux_printk, ARGS_REQ(1));
 
