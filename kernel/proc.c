@@ -13,37 +13,31 @@ static int written = 0;
 ssize_t
 mruby_proc_read(struct file *filp, char *buf, size_t count, loff_t *offp)
 {
-	if (*offp >= size)
-		return 0;
-
-	if (*offp + count > size || *offp + count < *offp)
-		count = size - *offp;
-	count -= copy_to_user(buf, code + *offp, count);
-	*offp += count;
-	return count;
+	return simple_read_from_buffer(buf, count, offp, code, size);
 }
 
 ssize_t
 mruby_proc_write(struct file *filp, const char *buf, size_t count, loff_t *offp)
 {
-	if (*offp + count < *offp)
-		return 0;
+	ssize_t ret;
+	loff_t off = *offp;
 
-	if (*offp + count > size) {
-		void *new_ptr;
-		int new_size = *offp + count;
+	if (off < 0)
+		return -EINVAL;
+	if (count > size - off) {
+		void *new_code;
+		int new_size = count + off;
 
-		new_ptr = krealloc(code, new_size, GFP_KERNEL);
-		if (new_ptr == NULL)
+		new_code = krealloc(code, new_size, GFP_KERNEL);
+		if (new_code == NULL)
 			return -ENOMEM;
-		code = new_ptr;
+		code = new_code;
 		size = new_size;
 	}
-	count -= copy_from_user(code + *offp, buf, count);
-	*offp += count;
-	if (count > 0)
-	    written++;
-	return count;
+	ret = simple_write_to_buffer(code, size, offp, buf, count);
+	if (ret > 0)
+		written = 1;
+	return ret;
 }
 
 int
