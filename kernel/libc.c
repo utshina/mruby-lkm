@@ -34,13 +34,13 @@ int * __errno_location(void)
 
 long int strtol(const char *nptr, char **endptr, int base)
 {
-	printk("%s: %s\n", __FUNCTION__, nptr);
+	pr_notice("%s: %s\n", __FUNCTION__, nptr);
 	return 0;
 }
 
 unsigned long int strtoul(const char *nptr, char **endptr, int base)
 {
-	printk("%s: %s\n", __FUNCTION__, nptr);
+	pr_notice("%s: %s\n", __FUNCTION__, nptr);
 	return 0;
 }
 

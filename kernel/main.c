@@ -12,7 +12,7 @@ linux_printk(mrb_state *mrb, mrb_value self)
 	mrb_value str;
 
 	mrb_get_args(mrb, "S", &str);
-	ret = printk(KERN_INFO "mruby: %s\n", RSTRING_PTR(str));
+	ret = pr_info("mruby-lkm: %s\n", RSTRING_PTR(str));
 	retval.value.i = ret;
 	return retval;
 }

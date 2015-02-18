@@ -7,14 +7,14 @@
 
 static int lkm_init(void)
 {
-	printk(KERN_INFO "LKM: init\n");
+	pr_info("mruby-lkm: init\n");
 	mruby_proc_init();
 	return 0;
 }
 
 static void lkm_exit(void) {
 	mruby_proc_exit();
-	printk(KERN_INFO "LKM: exit\n");
+	pr_info("mruby-lkm: exit\n");
 }
 
 module_init(lkm_init);

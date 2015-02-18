@@ -54,7 +54,7 @@ mruby_proc_release(struct inode *inode, struct file *file)
 
 	if (written) {
 	    ret = mruby_exec(code);
-	    printk("mruby: ret = %d\n", ret.value.i);
+	    pr_info("mruby-lkm: ret = %d\n", ret.value.i);
 	    written = 0;
 	}
     
@@ -72,20 +72,16 @@ proc_fops = {
 };
 struct proc_dir_entry *proc_entry;
 
-int mruby_proc_init(void)
+void mruby_proc_init(void)
 {
 	proc_entry = proc_create("mruby", 0644, NULL, &proc_fops);
-	if (proc_entry == NULL) {
-		printk(KERN_INFO "mruby: can't create proc entry\n");
-		return -ENOMEM;
-	}
-	return 0;
+	if (!proc_entry)
+		pr_err("mruby-lkm: could't create /proc/mruby\n");
 }
 
-int mruby_proc_exit(void)
+void mruby_proc_exit(void)
 {
 	remove_proc_entry("mruby", NULL);
 	if (code != NULL)
 		kfree(code);
-	return 0;
 }
