@@ -16,6 +16,6 @@ compile rutime to run mruby on host, and make a mruby kernel module.
 
 ## Run
 
-    sudo insmod kernel/mruby.ko        # load the mruby kernel module
-    sudo cat hello.mrb > /proc/mruby   # load and execute the mruby bytecode
-    dmesg                              # check the output
+    sudo insmod kernel/mruby.ko                # load the mruby kernel module
+    sudo sh -c 'cat hello.mrb > /proc/mruby'   # load and execute the mruby bytecode
+    dmesg                                      # check the output
